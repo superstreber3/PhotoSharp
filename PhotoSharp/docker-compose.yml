@@ -1,0 +1,6 @@
+﻿services:
+  photosharp:
+    image: photosharp
+    build:
+      context: .
+      dockerfile: Dockerfile
