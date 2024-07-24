@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EF.Models.Models;
+using Microsoft.EntityFrameworkCore;
 using Models.Models;
 
 namespace Models;
@@ -6,6 +7,7 @@ namespace Models;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Image> Images { get; set; }
+    public DbSet<ImageThumbnail> ImageThumbnails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

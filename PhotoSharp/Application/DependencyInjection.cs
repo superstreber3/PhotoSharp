@@ -1,4 +1,5 @@
 ﻿using Application.Images;
+using Application.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,10 @@ public static class DependencyInjection
             .UseNpgsql(connectionString));
 
         services.BuildServiceProvider().GetService<AppDbContext>()?.Database.Migrate();
-        
+
         services.AddScoped<IImageService, ImageService>();
+
+        services.Configure<SettingsOptions>(configuration.GetSection("Settings"));
         return services;
     }
 }
