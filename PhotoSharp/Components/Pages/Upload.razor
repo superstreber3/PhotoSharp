@@ -1,0 +1,23 @@
+﻿@page "/upload"
+@using Application.Images
+@rendermode InteractiveServer
+@inject IImageService ImageService
+
+<PageTitle>Upload</PageTitle>
+
+<h1>Upload</h1>
+
+<!-- add an on upload event to the input element -->
+<InputFile OnChange="LoadFiles" multiple />
+
+
+@code {
+    
+    private async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            await ImageService.UploadImagesFromBrowserAsync(file.OpenReadStream(), file.Name, file.ContentType);
+        }
+    }
+}

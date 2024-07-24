@@ -1,0 +1,16 @@
+
+PhotoSharp/.idea/
+
+PhotoSharp/Application/bin/
+
+PhotoSharp/Application/obj/
+
+PhotoSharp/bin/
+
+PhotoSharp/obj/
+
+PhotoSharp/EF.Models/obj/
+
+PhotoSharp/EF.Models/bin/
+
+PhotoSharp/EF.Manager/obj/
