@@ -1,5 +1,6 @@
 ﻿using Application.Settings;
 using EF.Models.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Models;
 using Models.Models;
@@ -13,7 +14,7 @@ namespace Application.Images;
 
 public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> settings) : IImageService
 {
-    public async Task<Image> UploadImagesFromBrowserAsync(Stream fileStream, string fileName, string contentType)
+    public async Task<Image?> UploadImagesFromBrowserAsync(Stream fileStream, string fileName, string contentType)
     {
         //write the file to the file system (storage folder on C: drive)
         var path = $"{settings.Value.RootFolder}\\{fileName}{DateTime.Now:yy-MM-ddTHH-mm-ss}.{GetContentType(contentType)}";
@@ -46,6 +47,21 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
         await appDbContext.Images.AddAsync(image);
         await appDbContext.SaveChangesAsync();
         return image;
+    }
+
+    public async Task<List<Image>> GetImagesAsync(int pageIndex, int pageSize)
+    {
+        return await appDbContext.Images
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<Image?> GetImageAsync(Guid imageId)
+    {
+        return await appDbContext.Images
+            .Include(x => x.Thumbnail)
+            .FirstOrDefaultAsync(x => x.Id == imageId);
     }
 
     private async Task<ImageThumbnail> GenerateThumbnailForImage(string filename, string contentType, string filePath)

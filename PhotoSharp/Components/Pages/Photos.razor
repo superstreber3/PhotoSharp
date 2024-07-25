@@ -1,0 +1,26 @@
+﻿@page "/"
+@using Application.Images
+@using EF.Models.Models
+@using Models.Models
+@inject IImageService ImageService
+@rendermode InteractiveServer
+
+<PageTitle>Photos</PageTitle>
+
+<h1>Photos</h1>
+
+@foreach (var image in images)
+{
+    <img src="/api/images/@image.Id/thumbnail">
+}
+
+
+@code{
+
+    private List<Image> images = [];
+
+    protected async override Task OnInitializedAsync()
+    {
+        images = await ImageService.GetImagesAsync(0, 20);
+    }
+}

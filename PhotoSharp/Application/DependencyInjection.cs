@@ -1,5 +1,6 @@
 ﻿using Application.Images;
 using Application.Settings;
+using Application.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +17,14 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options => options
             .UseNpgsql(connectionString));
 
-        services.BuildServiceProvider().GetService<AppDbContext>()?.Database.Migrate();
-
         services.AddScoped<IImageService, ImageService>();
-
+        services.AddScoped<IStorageService, StorageService>();
+        
         services.Configure<SettingsOptions>(configuration.GetSection("Settings"));
+        
+        services.BuildServiceProvider().GetService<AppDbContext>()?.Database.Migrate();
+        services.BuildServiceProvider().GetService<IStorageService>()?.EnsureStorageFoldersExistsAsync();
+
         return services;
     }
 }

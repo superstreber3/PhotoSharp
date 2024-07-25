@@ -7,7 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddApplication(builder.Configuration);
+
+
+
 
 var app = builder.Build();
 
@@ -22,9 +28,15 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.UseRouting();
+app.UseAntiforgery();
+app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
 
 app.Run();

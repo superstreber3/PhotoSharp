@@ -5,5 +5,7 @@ namespace Application.Images;
 
 public interface IImageService
 {
-    Task<Image> UploadImagesFromBrowserAsync(Stream fileStream, string fileName, string contentType);
+    Task<Image?> UploadImagesFromBrowserAsync(Stream fileStream, string fileName, string contentType);
+    Task<List<Image>> GetImagesAsync(int pageIndex, int pageSize);
+    Task<Image?> GetImageAsync(Guid imageId);
 }
