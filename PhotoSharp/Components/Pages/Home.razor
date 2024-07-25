@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using Application.Images
 @using EF.Models.Models
-@using Models.Models
 @inject IImageService ImageService
 @rendermode InteractiveServer
 
@@ -9,18 +8,20 @@
 
 <h1>Photos</h1>
 
-@foreach (var image in images)
+@foreach (var image in _images)
 {
-    <img src="/api/images/@image.Id/thumbnail">
+    <a href="/photo/@image.Id">
+        <img src="/api/images/@image.Id/thumbnail" alt="@image.FileName">
+    </a>
 }
 
 
 @code{
 
-    private List<Image> images = [];
+    private List<Image> _images = [];
 
     protected async override Task OnInitializedAsync()
     {
-        images = await ImageService.GetImagesAsync(0, 20);
+        _images = await ImageService.GetImagesAsync(0, 20);
     }
 }

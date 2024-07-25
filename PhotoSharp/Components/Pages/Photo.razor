@@ -1,0 +1,36 @@
+﻿@page "/photo/{PhotoId:guid}"
+@using Application.Images
+@using EF.Models.Models
+@inject IImageService ImageService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (_image is not null)
+{
+    <PageTitle>Photos - @_image.FileName</PageTitle>
+    <h1>@_image.FileName</h1>
+    <img src="/api/images/@_image.Id" alt="@_image.FileName">
+}
+
+
+@code{
+
+    [Parameter]
+    public Guid PhotoId { get; set; }
+
+    private Image? _image;
+
+    //get the image
+    protected async override Task OnInitializedAsync()
+    {
+        var image = await ImageService.GetImageAsync(PhotoId);
+        if (image is null)
+        {
+            //navigate to the 404 page
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+        _image = image;
+    }
+
+}
