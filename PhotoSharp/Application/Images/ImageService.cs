@@ -16,8 +16,8 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
 {
     public async Task<Image?> UploadImagesFromBrowserAsync(Stream fileStream, string fileName, string contentType)
     {
-        //write the file to the file system (storage folder on C: drive)
-        var path = $"{settings.Value.RootFolder}\\{fileName}{DateTime.Now:yy-MM-ddTHH-mm-ss}.{GetContentType(contentType)}";
+        var imageId = Guid.NewGuid();
+        var path = $"{settings.Value.RootFolder}\\{imageId}.{GetContentType(contentType)}";
         await using (var fs = new FileStream(path, FileMode.Create))
         {
             await fileStream.CopyToAsync(fs);
@@ -35,13 +35,14 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
         //save image to the database
         var image = new Image
         {
+            Id = imageId,
             FileName = RemoveFileExtension(fileName),
             FilePath = path,
             Width = width,
             Height = height,
             ContentType = contentType,
             CreatedAt = DateTime.Now.ToUniversalTime(),
-            Thumbnail = [await GenerateThumbnailForImage(fileName, contentType, path)]
+            Thumbnail = [await GenerateThumbnailForImage(contentType, path)]
         };
 
         await appDbContext.Images.AddAsync(image);
@@ -81,9 +82,10 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
         });
     }
 
-    private async Task<ImageThumbnail> GenerateThumbnailForImage(string filename, string contentType, string filePath)
+    private async Task<ImageThumbnail> GenerateThumbnailForImage(string contentType, string filePath)
     {
-        var thumbnailPath = $"{settings.Value.RootFolder}\\thumbnails\\{filename}{DateTime.Now:yy-MM-ddTHH-mm-ss}.{GetContentType(contentType)}";
+        var thumbnailId = Guid.NewGuid();
+        var thumbnailPath = $"{settings.Value.RootFolder}\\thumbnails\\{thumbnailId}.{GetContentType(contentType)}";
         //copy image to the thumbnail folder
         //resize the image
         using var img = await SixLabors.ImageSharp.Image.LoadAsync(filePath);
@@ -96,6 +98,7 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
         await img.SaveAsync(fileStream, GetEncoder(contentType));
         var thumbnail = new ImageThumbnail
         {
+            Id = thumbnailId,
             FilePath = thumbnailPath,
             Width = width,
             Height = height,
