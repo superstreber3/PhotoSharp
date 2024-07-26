@@ -10,8 +10,8 @@
     <PageTitle>Photos - @_image.FileName</PageTitle>
     <h1>@_image.FileName</h1>
     <img src="/api/images/@_image.Id" alt="@_image.FileName">
+    <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
 }
-
 
 @code{
 
@@ -26,11 +26,23 @@
         var image = await ImageService.GetImageAsync(PhotoId);
         if (image is null)
         {
-            //navigate to the 404 page
             NavigationManager.NavigateTo("/");
             return;
         }
         _image = image;
+    }
+
+    private async Task DeleteImage()
+    {
+        try
+        {
+            await ImageService.DeleteImageAsync(PhotoId);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
 }

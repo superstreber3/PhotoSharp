@@ -35,7 +35,7 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
         //save image to the database
         var image = new Image
         {
-            FileName = fileName,
+            FileName = RemoveFileExtension(fileName),
             FilePath = path,
             Width = width,
             Height = height,
@@ -64,6 +64,23 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
             .FirstOrDefaultAsync(x => x.Id == imageId);
     }
 
+    public async Task DeleteImageAsync(Guid imageId)
+    {
+        var image = await appDbContext.Images
+            .Include(x => x.Thumbnail)
+            .FirstOrDefaultAsync(x => x.Id == imageId);
+        if (image == null) return;
+
+        appDbContext.Images.Remove(image);
+        await appDbContext.SaveChangesAsync();
+        //delete the image from the file system
+        File.Delete(image.FilePath);
+        image.Thumbnail.ForEach(imageThumbnail =>
+        {
+            File.Delete(imageThumbnail.FilePath);
+        });
+    }
+
     private async Task<ImageThumbnail> GenerateThumbnailForImage(string filename, string contentType, string filePath)
     {
         var thumbnailPath = $"{settings.Value.RootFolder}\\thumbnails\\{filename}{DateTime.Now:yy-MM-ddTHH-mm-ss}.{GetContentType(contentType)}";
@@ -87,6 +104,11 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
 
         return thumbnail;
 
+    }
+
+    private static string RemoveFileExtension(string fileName)
+    {
+        return fileName[..fileName.LastIndexOf('.')];
     }
 
     private IImageEncoder GetEncoder(string contentType)
