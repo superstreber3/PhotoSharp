@@ -1,7 +1,10 @@
 ﻿@page "/photo/{PhotoId:guid}"
+@using Application.Albums
 @using Application.Images
 @using EF.Models.Models
+@using PhotoSharp.Components.Dialogs
 @inject IImageService ImageService
+@inject IAlbumService AlbumService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
@@ -10,18 +13,21 @@
     <PageTitle>Photos - @_image.FileName</PageTitle>
     <h1>@_image.FileName</h1>
     <img src="/api/images/@_image.Id" alt="@_image.FileName">
+    <!-- Add Image to Album -->
+    <button class="btn btn-primary" @onclick="OpenChooseAlbumDialog">Add to Album</button>
     <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
+<AlbumChooserDialog IsOpen="@_isDialogOpen" IsOpenChanged="@(open => _isDialogOpen = open)" OnAlbumSelected="HandleAlbumSelected"></AlbumChooserDialog>
 }
 
 @code{
 
     [Parameter]
     public Guid PhotoId { get; set; }
-
+    private bool _isDialogOpen;
     private Image? _image;
 
     //get the image
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         var image = await ImageService.GetImageAsync(PhotoId);
         if (image is null)
@@ -30,6 +36,16 @@
             return;
         }
         _image = image;
+    }
+    
+    private void OpenChooseAlbumDialog()
+    {
+        _isDialogOpen = true;
+    }
+    
+    private void HandleAlbumSelected(Guid albumId)
+    {
+        AlbumService.AddImageToAlbumAsync(albumId, _image!.Id);
     }
 
     private async Task DeleteImage()
