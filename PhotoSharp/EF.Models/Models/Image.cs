@@ -16,4 +16,5 @@ public class Image
     public required string ContentType { get; set; }
     public DateTime CreatedAt { get; set; }
     public required List<ImageThumbnail> Thumbnail { get; set; }
+    public List<Album> Album { get; set; } = [];
 }

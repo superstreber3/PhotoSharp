@@ -1,0 +1,41 @@
+﻿@page "/albums/add"
+@using Application.Albums
+@using Application.Albums.AlbumDto
+@inject IAlbumService AlbumService
+@rendermode InteractiveServer
+
+<PageTitle>Add Albums</PageTitle>
+
+<h1>Add Albums</h1>
+
+<EditForm Model="_album" OnValidSubmit="CreateAlbum">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="albumName" class="form-label">Album Name</label>
+            <InputText id="albumName" class="form-control" @bind-Value="_album.Name"/>
+            <ValidationMessage For="@(() => _album.Name)"/>
+        </div>
+        <div class="col-md-6">
+            <label for="description" class="form-label">Description</label>
+            <InputText id="description" class="form-control" @bind-Value="_album.Description"/>
+            <ValidationMessage For="@(() => _album.Description)"/>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Add Album</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private CreateAlbumRequestDto _album = new();
+
+    private async Task CreateAlbum()
+    {
+        await AlbumService.CreateAlbumAsync(_album);
+
+        _album = new CreateAlbumRequestDto();
+    }
+}

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EF.Models.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240724130301_added_thumbnails")]
-    partial class added_thumbnails
+    [Migration("20240730084705_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,51 @@ namespace EF.Models.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AlbumImage", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ImagesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("AlbumId", "ImagesId");
+
+                    b.HasIndex("ImagesId");
+
+                    b.ToTable("AlbumImage");
+                });
+
+            modelBuilder.Entity("EF.Models.Models.Album", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CoverImageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Albums");
+                });
 
             modelBuilder.Entity("EF.Models.Models.Image", b =>
                 {
@@ -87,6 +132,21 @@ namespace EF.Models.Migrations
                     b.HasIndex("ImageId");
 
                     b.ToTable("ImageThumbnails");
+                });
+
+            modelBuilder.Entity("AlbumImage", b =>
+                {
+                    b.HasOne("EF.Models.Models.Album", null)
+                        .WithMany()
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EF.Models.Models.Image", null)
+                        .WithMany()
+                        .HasForeignKey("ImagesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Models.Models.ImageThumbnail", b =>

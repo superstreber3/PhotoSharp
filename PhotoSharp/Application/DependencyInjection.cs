@@ -1,4 +1,5 @@
-﻿using Application.Images;
+﻿using Application.Albums;
+using Application.Images;
 using Application.Settings;
 using Application.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ public static class DependencyInjection
 
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IStorageService, StorageService>();
+        services.AddScoped<IAlbumService, AlbumService>();
         
         services.Configure<SettingsOptions>(configuration.GetSection("Settings"));
         

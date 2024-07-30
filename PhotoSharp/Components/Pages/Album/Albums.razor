@@ -1,0 +1,36 @@
+﻿@page "/albums"
+@using Application.Albums
+@using EF.Models.Models
+@inject IAlbumService AlbumService
+@rendermode InteractiveServer
+
+<PageTitle>Albums</PageTitle>
+
+<h1>Albums</h1>
+
+<a class="btn btn-primary" href="albums/add">Add Album</a>
+
+@foreach (var album in _albums)
+{
+    <a href="/album/@album.Id">
+        @if (album.CoverImageId is not null)
+        {
+            <img src="/api/images/@album.CoverImageId/thumbnail" alt="@album.CoverImageId">
+        }
+        else
+        {
+            <img src="https://via.placeholder.com/150" alt="Placeholder">
+        }
+    </a>
+}
+
+
+@code{
+
+    private List<Album> _albums = [];
+
+    protected async override Task OnInitializedAsync()
+    {
+        _albums = await AlbumService.GetAlbumsAsync();
+    }
+}
