@@ -1,0 +1,60 @@
+﻿@page "/album/{AlbumId:guid}"
+@using Application.Albums
+@inject IAlbumService AlbumService
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Albums</PageTitle>
+
+<h1>Albums</h1>
+
+<a class="btn btn-primary" href="albums/add">Add Album</a>
+@if (_album is not null)
+{
+    <h2>@_album.Name</h2>
+    <p>@_album.Description</p>
+    <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
+    <a class="btn btn-primary" href="albums/edit/@AlbumId">Edit</a>
+    <a class="btn btn-primary" href="albums/add">Add Image</a>
+    <br>
+    @foreach (var albumImage in _album.Images)
+    {
+        <a href="/photo/@albumImage.Id">
+            <img src="/api/images/@albumImage.Id/thumbnail" alt="@albumImage.FileName">
+        </a>
+    }
+}
+
+@code{
+
+    [Parameter]
+    public Guid AlbumId { get; set; }
+
+    private EF.Models.Models.Album? _album;
+
+    //get the image
+    protected async override Task OnInitializedAsync()
+    {
+        var album = await AlbumService.GetAlbumAsync(AlbumId);
+        if (album is null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+        _album = album;
+    }
+
+    private async Task DeleteImage()
+    {
+        try
+        {
+            await AlbumService.DeleteAlbumAsync(AlbumId);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
