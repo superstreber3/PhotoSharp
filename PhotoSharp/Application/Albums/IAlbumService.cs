@@ -11,5 +11,6 @@ public interface IAlbumService
     public Task<Album> UpdateAlbumAsync(UpdateAlbumRequestDto updateAlbumRequest);
     public Task DeleteAlbumAsync(Guid id);
     public Task AddImageToAlbumAsync(Guid albumId, Guid imageId);
+    public Task AddImagesToAlbumAsync(Guid albumId, List<Guid> imageId);
     public Task RemoveImageFromAlbumAsync(Guid albumId, Guid imageId);
 }

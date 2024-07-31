@@ -1,5 +1,6 @@
 ﻿@page "/album/{AlbumId:guid}"
 @using Application.Albums
+@using PhotoSharp.Components.Dialogs
 @inject IAlbumService AlbumService
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
@@ -15,24 +16,33 @@
     <p>@_album.Description</p>
     <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
     <a class="btn btn-primary" href="albums/edit/@AlbumId">Edit</a>
+    <button class="btn btn-primary" @onclick="OpenChooseImagesDialog">Add Images</button>
     <br>
     @foreach (var albumImage in _album.Images)
     {
-        <a href="/photo/@albumImage.Id">
-            <img src="/api/images/@albumImage.Id/thumbnail" alt="@albumImage.FileName">
+        <a href="/image/@albumImage.Id">
+            <img src="/api/images/@albumImage.Id/thumbnail" alt="@albumImage.Name">
         </a>
     }
+    <ImageChooserDialog IsOpen="@_isDialogOpen" IsOpenChanged="@(open => _isDialogOpen = open)" OnImagesSelected="HandleImagesSelected"></ImageChooserDialog>
+
 }
 
 @code{
 
     [Parameter]
     public Guid AlbumId { get; set; }
-
+    private bool _isDialogOpen;
     private EF.Models.Models.Album? _album;
 
     //get the image
-    protected async override Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
+    {
+        GetAlbum();
+        return base.OnInitializedAsync();
+    }
+    
+    private async void GetAlbum()
     {
         var album = await AlbumService.GetAlbumAsync(AlbumId);
         if (album is null)
@@ -40,7 +50,12 @@
             NavigationManager.NavigateTo("/");
             return;
         }
-        _album = album;
+        _album = album;    }
+
+    private async void HandleImagesSelected(List<Guid> imageIds)
+    {
+       await AlbumService.AddImagesToAlbumAsync(AlbumId, imageIds);
+       GetAlbum();
     }
 
     private async Task DeleteImage()
@@ -54,5 +69,10 @@
         {
             Console.WriteLine(ex.Message);
         }
+    }
+
+    private void OpenChooseImagesDialog()
+    {
+        _isDialogOpen = true;
     }
 }

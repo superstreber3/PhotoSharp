@@ -7,7 +7,7 @@ public class Image
 {
     public Guid Id { get; set; }
     [MaxLength(100)]
-    public required string FileName { get; set; }
+    public required string Name { get; set; }
     [MaxLength(100)]
     public required string FilePath { get; set; }
     public int Width { get; set; }

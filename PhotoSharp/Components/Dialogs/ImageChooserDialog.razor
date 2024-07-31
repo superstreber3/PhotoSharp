@@ -1,0 +1,72 @@
+﻿@using Application.Images
+@inject IImageService ImageService
+@if (IsOpen)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Choose Images</h5>
+                    <button type="button" class="close" @onclick="CloseDialog">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-wrap">
+                        @foreach (var image in _images)
+                        {
+                            var isSelected = _selectedImageIds.Contains(image.Id);
+                            <div class="m-2" @onclick="() => ToggleImageSelection(image.Id)" style="border: @(isSelected ? "2px solid blue" : "none"); cursor: pointer;">
+                                <img src="/api/images/@image.Id/thumbnail" alt="@image.Name" style="width: 100px; height: 100px;">
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="SubmitSelection">Select</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDialog">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    private List<EF.Models.Models.Image> _images = [];
+    private HashSet<Guid> _selectedImageIds = [];
+
+    [Parameter]
+    public EventCallback<List<Guid>> OnImagesSelected { get; set; }
+
+    private async Task CloseDialog()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(IsOpen);
+    }
+
+    private void ToggleImageSelection(Guid imageId)
+    {
+        if (!_selectedImageIds.Add(imageId))
+        {
+            _selectedImageIds.Remove(imageId);
+        }
+    }
+
+    private async Task SubmitSelection()
+    {
+        await OnImagesSelected.InvokeAsync(_selectedImageIds.ToList());
+        await CloseDialog();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        _images = await ImageService.GetImagesAsync(0, 20);
+    }
+}

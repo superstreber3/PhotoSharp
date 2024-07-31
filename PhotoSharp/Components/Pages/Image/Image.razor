@@ -1,4 +1,4 @@
-﻿@page "/photo/{PhotoId:guid}"
+﻿@page "/image/{ImageId:guid}"
 @using Application.Albums
 @using Application.Images
 @using EF.Models.Models
@@ -10,26 +10,26 @@
 
 @if (_image is not null)
 {
-    <PageTitle>Photos - @_image.FileName</PageTitle>
-    <h1>@_image.FileName</h1>
-    <img src="/api/images/@_image.Id" alt="@_image.FileName">
+    <PageTitle>Image - @_image.Name</PageTitle>
+    <h1>@_image.Name</h1>
+    <img src="/api/images/@_image.Id" alt="@_image.Name">
     <!-- Add Image to Album -->
     <button class="btn btn-primary" @onclick="OpenChooseAlbumDialog">Add to Album</button>
     <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
-<AlbumChooserDialog IsOpen="@_isDialogOpen" IsOpenChanged="@(open => _isDialogOpen = open)" OnAlbumSelected="HandleAlbumSelected"></AlbumChooserDialog>
+    <AlbumChooserDialog IsOpen="@_isDialogOpen" IsOpenChanged="@(open => _isDialogOpen = open)" OnAlbumSelected="HandleAlbumSelected"></AlbumChooserDialog>
 }
 
 @code{
 
     [Parameter]
-    public Guid PhotoId { get; set; }
+    public Guid ImageId { get; set; }
     private bool _isDialogOpen;
-    private Image? _image;
+    private EF.Models.Models.Image? _image;
 
     //get the image
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
-        var image = await ImageService.GetImageAsync(PhotoId);
+        var image = await ImageService.GetImageAsync(ImageId);
         if (image is null)
         {
             NavigationManager.NavigateTo("/");
@@ -37,12 +37,12 @@
         }
         _image = image;
     }
-    
+
     private void OpenChooseAlbumDialog()
     {
         _isDialogOpen = true;
     }
-    
+
     private void HandleAlbumSelected(Guid albumId)
     {
         AlbumService.AddImageToAlbumAsync(albumId, _image!.Id);
@@ -52,7 +52,7 @@
     {
         try
         {
-            await ImageService.DeleteImageAsync(PhotoId);
+            await ImageService.DeleteImageAsync(ImageId);
             NavigationManager.NavigateTo("/");
         }
         catch (Exception ex)

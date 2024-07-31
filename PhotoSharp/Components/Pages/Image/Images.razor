@@ -1,24 +1,23 @@
-﻿@page "/"
+﻿@page "/image"
 @using Application.Images
-@using EF.Models.Models
 @inject IImageService ImageService
 @rendermode InteractiveServer
 
-<PageTitle>Photos</PageTitle>
+<PageTitle>Images</PageTitle>
 
-<h1>Photos</h1>
+<h1>Images</h1>
 
 @foreach (var image in _images)
 {
-    <a href="/photo/@image.Id">
-        <img src="/api/images/@image.Id/thumbnail" alt="@image.FileName">
+    <a href="/image/@image.Id">
+        <img src="/api/images/@image.Id/thumbnail" alt="@image.Name">
     </a>
 }
 
 
 @code{
 
-    private List<Image> _images = [];
+    private List<EF.Models.Models.Image> _images = [];
 
     protected async override Task OnInitializedAsync()
     {

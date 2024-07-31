@@ -36,7 +36,7 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
         var image = new Image
         {
             Id = imageId,
-            FileName = RemoveFileExtension(fileName),
+            Name = RemoveFileExtension(fileName),
             FilePath = path,
             Width = width,
             Height = height,

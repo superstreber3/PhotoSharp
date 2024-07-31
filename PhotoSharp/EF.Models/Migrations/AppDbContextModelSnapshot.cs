@@ -81,11 +81,6 @@ namespace EF.Models.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -93,6 +88,11 @@ namespace EF.Models.Migrations
 
                     b.Property<int>("Height")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("Width")
                         .HasColumnType("integer");

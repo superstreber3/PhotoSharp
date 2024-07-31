@@ -1,0 +1,21 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+<h1>Welcome to PhotoSharp</h1>
+<p>PhotoSharp is a simple photo gallery application built with Blazor and ASP.NET Core Web API.</p>
+<button class="btn btn-primary" @onclick="NavigateToImages">View Images</button>
+<button class="btn btn-primary" @onclick="NavigateToAlbums">View Albums</button>
+
+@code
+{
+    private void NavigateToImages()
+    {
+        NavigationManager.NavigateTo("/image");
+    }
+    private void NavigateToAlbums()
+    {
+        NavigationManager.NavigateTo("/album");
+    }
+}

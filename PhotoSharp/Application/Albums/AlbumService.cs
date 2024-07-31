@@ -79,6 +79,20 @@ public class AlbumService(AppDbContext appDbContext) : IAlbumService
         album.Images.Add(image);
         await appDbContext.SaveChangesAsync();
     }
+
+    public async Task AddImagesToAlbumAsync(Guid albumId, List<Guid> imageIds)
+    {
+        var album = await appDbContext.Albums
+            .Include(a => a.Images)
+            .FirstOrDefaultAsync(a => a.Id == albumId);
+        if (album == null) return;
+
+        var images = await appDbContext.Images.Where(i => imageIds.Contains(i.Id)).ToListAsync();
+        if (images.Count == 0) return;
+
+        album.Images.AddRange(images);
+        await appDbContext.SaveChangesAsync();
+    }
     public async Task RemoveImageFromAlbumAsync(Guid albumId, Guid imageId)
     {
         var album = await appDbContext.Albums.FindAsync(albumId);

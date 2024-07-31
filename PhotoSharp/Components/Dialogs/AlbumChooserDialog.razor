@@ -53,7 +53,7 @@
         await CloseDialog();
     }
     
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
         _albums = await AlbumService.GetAlbumsAsync();
     }
