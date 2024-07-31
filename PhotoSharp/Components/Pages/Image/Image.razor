@@ -31,7 +31,7 @@
         var image = await ImageService.GetImageAsync(ImageId);
         if (image is null)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/image");
             return;
         }
         _image = image;
@@ -52,7 +52,7 @@
         try
         {
             await ImageService.DeleteImageAsync(ImageId);
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/image");
         }
         catch (Exception ex)
         {

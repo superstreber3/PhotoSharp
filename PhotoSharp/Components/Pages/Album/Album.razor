@@ -46,7 +46,7 @@
         var album = await AlbumService.GetAlbumAsync(AlbumId);
         if (album is null)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/album");
             return;
         }
         _album = album;
@@ -63,7 +63,7 @@
         try
         {
             await AlbumService.DeleteAlbumAsync(AlbumId);
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/album");
         }
         catch (Exception ex)
         {
