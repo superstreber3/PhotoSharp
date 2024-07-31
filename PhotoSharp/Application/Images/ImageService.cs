@@ -58,6 +58,11 @@ public class ImageService(AppDbContext appDbContext, IOptions<SettingsOptions> s
             .ToListAsync();
     }
 
+    public async Task<int> GetImagesCountAsync()
+    {
+        return await appDbContext.Images.CountAsync();
+    }
+    
     public async Task<Image?> GetImageAsync(Guid imageId)
     {
         return await appDbContext.Images
