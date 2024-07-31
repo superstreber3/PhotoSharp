@@ -18,16 +18,16 @@
 
 <div class="paging-buttons">
     <button @onclick="PreviousPage" disabled="@(_currentPage == 0)">Previous</button>
-    <span>Page @(_currentPage + 1) of @(_totalPages)</span>
-    <button @onclick="NextPage" disabled="@(_currentPage == _totalPages - 1)">Next</button>
+    <span>Page @(_currentPage + 1) of @(TotalPages)</span>
+    <button @onclick="NextPage" disabled="@(_currentPage == TotalPages - 1)">Next</button>
 </div>
 
 @code {
-    private List<EF.Models.Models.Image> _images = new List<EF.Models.Models.Image>();
+    private List<EF.Models.Models.Image> _images = [];
     private int _imageCount;
-    private int _currentPage = 0;
-    private int _pageSize = 20;
-    private int _totalPages => (_imageCount + _pageSize - 1) / _pageSize;
+    private int _currentPage;
+    private const int PageSize = 20;
+    private int TotalPages => (_imageCount + PageSize - 1) / PageSize;
 
     protected async override Task OnInitializedAsync()
     {
@@ -36,13 +36,13 @@
 
     private async Task LoadImages()
     {
-        _images = await ImageService.GetImagesAsync(_currentPage, _pageSize);
+        _images = await ImageService.GetImagesAsync(_currentPage, PageSize);
         _imageCount = await ImageService.GetImagesCountAsync();
     }
 
     private async Task NextPage()
     {
-        if (_currentPage < _totalPages - 1)
+        if (_currentPage < TotalPages - 1)
         {
             _currentPage++;
             await LoadImages();

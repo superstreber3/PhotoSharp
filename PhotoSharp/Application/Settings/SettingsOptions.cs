@@ -2,5 +2,5 @@
 
 public class SettingsOptions
 {
-    public string RootFolder { get; set; }
+    public string RootFolder { get; set; } = null!;
 }

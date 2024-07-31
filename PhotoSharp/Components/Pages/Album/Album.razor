@@ -36,13 +36,12 @@
     private EF.Models.Models.Album? _album;
 
     //get the image
-    protected override Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
-        GetAlbum();
-        return base.OnInitializedAsync();
+        await GetAlbum();
     }
-    
-    private async void GetAlbum()
+
+    private async Task GetAlbum()
     {
         var album = await AlbumService.GetAlbumAsync(AlbumId);
         if (album is null)
@@ -50,12 +49,13 @@
             NavigationManager.NavigateTo("/");
             return;
         }
-        _album = album;    }
+        _album = album;
+    }
 
     private async void HandleImagesSelected(List<Guid> imageIds)
     {
-       await AlbumService.AddImagesToAlbumAsync(AlbumId, imageIds);
-       GetAlbum();
+        await AlbumService.AddImagesToAlbumAsync(AlbumId, imageIds);
+        GetAlbum();
     }
 
     private async Task DeleteImage()
