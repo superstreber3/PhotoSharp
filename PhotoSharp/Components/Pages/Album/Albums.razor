@@ -7,29 +7,37 @@
 
 <h1>Albums</h1>
 
-<a class="btn btn-primary" href="albums/add">Add Album</a>
+<a class="btn btn-primary mb-3" href="albums/add">Add Album</a>
 
-@foreach (var album in _albums)
-{
-    <a href="/album/@album.Id">
-        @if (album.CoverImageId is not null)
-        {
-            <img src="/api/images/@album.CoverImageId/thumbnail" alt="@album.CoverImageId">
-        }
-        else
-        {
-            <img src="https://via.placeholder.com/150" alt="Placeholder">
-        }
-    </a>
-}
-
+<div class="row">
+    @foreach (var album in _albums)
+    {
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <a href="/album/@album.Id" class="text-decoration-none">
+                @if (album.CoverImageId is not null)
+                {
+                <img src="/api/images/@album.CoverImageId/thumbnail" alt="@album.Name" class="card-img-top" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                <img src="https://via.placeholder.com/150" alt="Placeholder" class="card-img-top" style="height: 200px; object-fit: cover;">
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@album.Name</h5>
+                    <p class="card-text">@album.Description</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    }
+</div>
 
 @code{
+private List<EF.Models.Models.Album> _albums = [];
 
-    private List<EF.Models.Models.Album> _albums = [];
-
-    protected async override Task OnInitializedAsync()
-    {
-        _albums = await AlbumService.GetAlbumsAsync();
-    }
+protected async override Task OnInitializedAsync()
+{
+_albums = await AlbumService.GetAlbumsAsync();
+}
 }

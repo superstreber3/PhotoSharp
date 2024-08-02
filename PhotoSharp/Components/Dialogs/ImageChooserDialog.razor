@@ -21,6 +21,11 @@
                             </div>
                         }
                     </div>
+                    <div class="paging-buttons">
+                        <button @onclick="PreviousPage" disabled="@(_currentPage == 0)">Previous</button>
+                        <span>Page @(_currentPage + 1) of @(TotalPages)</span>
+                        <button @onclick="NextPage" disabled="@(_currentPage == TotalPages - 1)">Next</button>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" @onclick="SubmitSelection">Select</button>
@@ -47,6 +52,11 @@
 
     [Parameter]
     public EventCallback<List<Guid>> OnImagesSelected { get; set; }
+
+    private int _imageCount;
+    private int _currentPage;
+    private const int PageSize = 20;
+    private int TotalPages => (_imageCount + PageSize - 1) / PageSize;
 
     private async Task CloseDialog()
     {
@@ -85,6 +95,30 @@
 
     protected async override Task OnInitializedAsync()
     {
-        _images = await ImageService.GetImagesAsync(0, 20);
+        await LoadImages();
+    }
+
+    private async Task LoadImages()
+    {
+        _images = await ImageService.GetImagesAsync(_currentPage, PageSize);
+        _imageCount = await ImageService.GetImagesCountAsync();
+    }
+
+    private async Task NextPage()
+    {
+        if (_currentPage < TotalPages - 1)
+        {
+            _currentPage++;
+            await LoadImages();
+        }
+    }
+
+    private async Task PreviousPage()
+    {
+        if (_currentPage > 0)
+        {
+            _currentPage--;
+            await LoadImages();
+        }
     }
 }

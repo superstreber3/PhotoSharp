@@ -1,12 +1,14 @@
 ﻿@page "/albums/add"
 @using Application.Albums
 @using Application.Albums.AlbumDto
+@using PhotoSharp.Components.Dialogs
 @inject IAlbumService AlbumService
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Add Albums</PageTitle>
 
-<h1>Add Albums</h1>
+<h1>Add Album</h1>
 
 <EditForm Model="_album" OnValidSubmit="CreateAlbum">
     <DataAnnotationsValidator/>
@@ -23,19 +25,53 @@
             <InputText id="description" class="form-control" @bind-Value="_album.Description"/>
             <ValidationMessage For="@(() => _album.Description)"/>
         </div>
+        <div class="col-md-12">
+            <label class="form-label">Cover Image</label>
+            <div class="d-flex align-items-center mb-3">
+                @if (_album.CoverImageId is not null)
+                {
+                    <img src="/api/images/@_album.CoverImageId/thumbnail" alt="Cover Image" class="img-thumbnail me-3" style="width: 100px; height: 100px;">
+                }
+                else
+                {
+                    <img src="https://via.placeholder.com/100" alt="Placeholder" class="img-thumbnail me-3" style="width: 100px; height: 100px;">
+                }
+                <button type="button" class="btn btn-secondary" @onclick="OpenChooseImageDialog">Choose Image</button>
+            </div>
+        </div>
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Add Album</button>
         </div>
     </div>
 </EditForm>
 
+@if (_isChooseImageDialogOpen)
+{
+    <ImageChooserDialog IsOpen="@_isChooseImageDialogOpen" IsOpenChanged="@(open => _isChooseImageDialogOpen = open)" OnImagesSelected="HandleCoverImageSelected" MultiSelect="false"></ImageChooserDialog>
+}
+
 @code {
     private CreateAlbumRequestDto _album = new();
+    private bool _isChooseImageDialogOpen;
 
     private async Task CreateAlbum()
     {
-        await AlbumService.CreateAlbumAsync(_album);
+        var newAlbum = await AlbumService.CreateAlbumAsync(_album);
+        NavigationManager.NavigateTo($"/album/{newAlbum.Id}");
+    }
 
-        _album = new CreateAlbumRequestDto();
+    private void OpenChooseImageDialog()
+    {
+        _isChooseImageDialogOpen = true;
+    }
+
+    private void HandleCoverImageSelected(List<Guid> imageIds)
+    {
+        if (imageIds.Any())
+        {
+            _album.CoverImageId = imageIds.First();
+        }
+        _isChooseImageDialogOpen = false;
+        StateHasChanged();
     }
 }

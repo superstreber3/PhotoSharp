@@ -3,9 +3,8 @@
 @using Application.Albums.AlbumDto
 @using PhotoSharp.Components.Dialogs
 @inject IAlbumService AlbumService
-@rendermode InteractiveServer
 @inject NavigationManager NavigationManager
-
+@rendermode InteractiveServer
 
 <PageTitle>Albums</PageTitle>
 
@@ -13,48 +12,53 @@
 
 @if (_album is not null)
 {
-    <h2>@_album.Name</h2>
-    <p>@_album.Description</p>
-    @if (_album.CoverImageId is not null)
-    {
-        <img src="/api/images/@_album.CoverImageId/thumbnail" alt="@_album.Name" class="img-fluid">
-    }
-    else
-    {
-        <img src="https://via.placeholder.com/150" alt="Placeholder">
-    }
-    <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
-    <a class="btn btn-primary" href="albums/edit/@AlbumId">Edit</a>
-    <button class="btn btn-primary" @onclick="OpenChooseImagesDialog">Add Images</button>
-    <button class="btn btn-primary" @onclick="OpenChooseImageDialog">Change Cover Image</button>
+    <div class="mb-4">
+        <h2>@_album.Name</h2>
+        <p>@_album.Description</p>
+        @if (_album.CoverImageId is not null)
+        {
+            <img src="/api/images/@_album.CoverImageId/thumbnail" alt="@_album.Name" class="img-fluid mb-3">
+        }
+        else
+        {
+            <img src="https://via.placeholder.com/150" alt="Placeholder" class="img-fluid mb-3">
+        }
+    </div>
 
-    <br>
-    @foreach (var albumImage in _album.Images)
-    {
-        <a href="/image/@albumImage.Id">
-            <img src="/api/images/@albumImage.Id/thumbnail" alt="@albumImage.Name">
-        </a>
-    }
+    <div class="mb-3">
+        <button class="btn btn-danger me-2" @onclick="DeleteImage">Delete</button>
+        <a class="btn btn-primary me-2" href="albums/edit/@AlbumId">Edit</a>
+        <button class="btn btn-primary me-2" @onclick="OpenChooseImagesDialog">Add Images</button>
+        <button class="btn btn-primary" @onclick="OpenChooseImageDialog">Change Cover Image</button>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3">
+        @foreach (var albumImage in _album.Images)
+        {
+            <a href="/image/@albumImage.Id">
+                <img src="/api/images/@albumImage.Id/thumbnail" alt="@albumImage.Name" class="img-thumbnail" style="width: 100px; height: 100px;">
+            </a>
+        }
+    </div>
 
     @if (_isChooseImageDialogOpen)
     {
-        <ImageChooserDialog IsOpen="@_isChooseImageDialogOpen" IsOpenChanged="@(open => _isChooseImageDialogOpen = open)" OnImagesSelected="HandleCoverImageSelected" MultiSelect="@false"></ImageChooserDialog>
+        <ImageChooserDialog IsOpen="@_isChooseImageDialogOpen" IsOpenChanged="@(open => _isChooseImageDialogOpen = open)" OnImagesSelected="HandleCoverImageSelected" MultiSelect="false"></ImageChooserDialog>
     }
     @if (_isChooseImagesDialogOpen)
     {
-        <ImageChooserDialog IsOpen="@_isChooseImagesDialogOpen" IsOpenChanged="@(open => _isChooseImagesDialogOpen = open)" OnImagesSelected="HandleImagesSelected" MultiSelect="@true"></ImageChooserDialog>
+        <ImageChooserDialog IsOpen="@_isChooseImagesDialogOpen" IsOpenChanged="@(open => _isChooseImagesDialogOpen = open)" OnImagesSelected="HandleImagesSelected" MultiSelect="true"></ImageChooserDialog>
     }
 }
 
-@code{
-
+@code {
     [Parameter]
     public Guid AlbumId { get; set; }
     private bool _isChooseImagesDialogOpen;
     private bool _isChooseImageDialogOpen;
     private EF.Models.Models.Album? _album;
 
-    //get the image
+    // Get the album details
     protected async override Task OnInitializedAsync()
     {
         await GetAlbum();
