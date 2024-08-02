@@ -55,7 +55,7 @@
     private async void HandleImagesSelected(List<Guid> imageIds)
     {
         await AlbumService.AddImagesToAlbumAsync(AlbumId, imageIds);
-        GetAlbum();
+        await GetAlbum();
     }
 
     private async Task DeleteImage()

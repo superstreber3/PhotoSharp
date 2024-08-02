@@ -10,22 +10,26 @@
 @if (_image is not null)
 {
     <PageTitle>Image - @_image.Name</PageTitle>
-    <h1>@_image.Name</h1>
-    <img src="/api/images/@_image.Id" alt="@_image.Name">
-    <!-- Add Image to Album -->
-    <button class="btn btn-primary" @onclick="OpenChooseAlbumDialog">Add to Album</button>
-    <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
+    <div class="container mt-4">
+        <h1 class="text-center">@_image.Name</h1>
+        <div class="d-flex justify-content-center my-4">
+            <img src="/api/images/@_image.Id" alt="@_image.Name" class="img-fluid rounded">
+        </div>
+        <div class="d-flex justify-content-center gap-3">
+            <button class="btn btn-primary" @onclick="OpenChooseAlbumDialog">Add to Album</button>
+            <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
+            <a href="/api/images/@_image.Id" class="btn btn-success" download>Download</a>
+        </div>
+    </div>
     <AlbumChooserDialog IsOpen="@_isDialogOpen" IsOpenChanged="@(open => _isDialogOpen = open)" OnAlbumSelected="HandleAlbumSelected"></AlbumChooserDialog>
 }
 
-@code{
-
+@code {
     [Parameter]
     public Guid ImageId { get; set; }
     private bool _isDialogOpen;
     private EF.Models.Models.Image? _image;
 
-    //get the image
     protected async override Task OnInitializedAsync()
     {
         var image = await ImageService.GetImageAsync(ImageId);
@@ -59,5 +63,4 @@
             Console.WriteLine(ex.Message);
         }
     }
-
 }
