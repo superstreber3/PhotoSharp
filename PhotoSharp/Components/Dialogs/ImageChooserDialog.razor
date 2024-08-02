@@ -6,7 +6,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Choose Images</h5>
+                    <h5 class="modal-title">Choose @(MultiSelect ? "Images" : "Image")</h5>
                     <button type="button" class="close" @onclick="CloseDialog">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -39,8 +39,11 @@
     [Parameter]
     public EventCallback<bool> IsOpenChanged { get; set; }
 
-    private List<EF.Models.Models.Image> _images = [];
-    private HashSet<Guid> _selectedImageIds = [];
+    [Parameter]
+    public bool MultiSelect { get; set; } = true;
+
+    private List<EF.Models.Models.Image> _images = new();
+    private HashSet<Guid> _selectedImageIds = new();
 
     [Parameter]
     public EventCallback<List<Guid>> OnImagesSelected { get; set; }
@@ -53,9 +56,24 @@
 
     private void ToggleImageSelection(Guid imageId)
     {
-        if (!_selectedImageIds.Add(imageId))
+        if (MultiSelect)
         {
-            _selectedImageIds.Remove(imageId);
+            if (!_selectedImageIds.Add(imageId))
+            {
+                _selectedImageIds.Remove(imageId);
+            }
+        }
+        else
+        {
+            if (_selectedImageIds.Contains(imageId))
+            {
+                _selectedImageIds.Remove(imageId);
+            }
+            else
+            {
+                _selectedImageIds.Clear();
+                _selectedImageIds.Add(imageId);
+            }
         }
     }
 
