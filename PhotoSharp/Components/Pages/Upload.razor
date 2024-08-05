@@ -8,12 +8,12 @@
 <h1 class="title">Upload Images</h1>
 
 <div class="upload-container">
-    <InputFile OnChange="LoadFiles" multiple class="upload-input"/>
-    <div class="progress-container" style="display:@(progressVisible ? "block" : "none")">
-        <div class="progress-bar" style="width:@progress%"></div>
+    <InputFile OnChange="LoadFiles" multiple class="upload-input" accept="image/*"/>
+    <div class="progress-container" style="display:@(_progressVisible ? "block" : "none")">
+        <div class="progress-bar" style="width:@_progress%"></div>
     </div>
     <div class="file-list">
-        @foreach (var fileName in uploadedFiles)
+        @foreach (var fileName in _uploadedFiles)
         {
             <div class="file-item">@fileName</div>
         }
@@ -21,24 +21,36 @@
 </div>
 
 @code {
-    private List<string> uploadedFiles = [];
-    private int progress = 0;
-    private bool progressVisible = true;
+    private readonly List<string> _uploadedFiles = [];
+    private int _progress;
+    private bool _progressVisible;
+    private readonly List<string> _allowedImageTypes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
 
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
-        var files = e.GetMultipleFiles();
-        progressVisible = true;
-        uploadedFiles.Clear();
-        progress = 0;
+        var files = e.GetMultipleFiles(int.MaxValue); // explicitly set to int.MaxValue
+        _progressVisible = true;
+        _uploadedFiles.Clear();
+        _progress = 0;
+
+        var fileCount = files.Count;
+        var processedCount = 0;
+
         foreach (var file in files)
         {
-            await using var stream = file.OpenReadStream();
-            await ImageService.UploadImagesFromBrowserAsync(stream, file.Name, file.ContentType);
-            uploadedFiles.Add(file.Name);
-            progress = (int)((uploadedFiles.Count / (double)files.Count) * 100);
+            if (_allowedImageTypes.Contains(file.ContentType))
+            {
+                await using var stream = file.OpenReadStream(long.MaxValue); // ensure large file size limit
+                await ImageService.UploadImagesFromBrowserAsync(stream, file.Name, file.ContentType);
+                _uploadedFiles.Add(file.Name);
+            }
+
+            processedCount++;
+            _progress = (int)(processedCount / (double)fileCount * 100);
             StateHasChanged();
         }
-        progressVisible = true;
+
+        _progressVisible = false;
+        StateHasChanged();
     }
 }
