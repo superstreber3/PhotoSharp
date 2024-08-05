@@ -5,19 +5,40 @@
 
 <PageTitle>Upload</PageTitle>
 
-<h1>Upload</h1>
+<h1 class="title">Upload Images</h1>
 
-<!-- add an on upload event to the input element -->
-<InputFile OnChange="LoadFiles" multiple />
-
+<div class="upload-container">
+    <InputFile OnChange="LoadFiles" multiple class="upload-input"/>
+    <div class="progress-container" style="display:@(progressVisible ? "block" : "none")">
+        <div class="progress-bar" style="width:@progress%"></div>
+    </div>
+    <div class="file-list">
+        @foreach (var fileName in uploadedFiles)
+        {
+            <div class="file-item">@fileName</div>
+        }
+    </div>
+</div>
 
 @code {
-    
-    private async void LoadFiles(InputFileChangeEventArgs e)
+    private List<string> uploadedFiles = [];
+    private int progress = 0;
+    private bool progressVisible = true;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
     {
-        foreach (var file in e.GetMultipleFiles())
+        var files = e.GetMultipleFiles();
+        progressVisible = true;
+        uploadedFiles.Clear();
+        progress = 0;
+        foreach (var file in files)
         {
-            await ImageService.UploadImagesFromBrowserAsync(file.OpenReadStream(), file.Name, file.ContentType);
+            await using var stream = file.OpenReadStream();
+            await ImageService.UploadImagesFromBrowserAsync(stream, file.Name, file.ContentType);
+            uploadedFiles.Add(file.Name);
+            progress = (int)((uploadedFiles.Count / (double)files.Count) * 100);
+            StateHasChanged();
         }
+        progressVisible = true;
     }
 }

@@ -1,0 +1,45 @@
+.title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.upload-container {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.upload-input {
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    font-size: 16px;
+}
+.progress-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+.progress-bar {
+    height: 20px;
+    background-color: #4caf50;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+}
+.file-list {
+    margin-top: 20px;
+    text-align: left;
+}
+.file-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
