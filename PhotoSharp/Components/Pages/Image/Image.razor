@@ -10,15 +10,28 @@
 @if (_image is not null)
 {
     <PageTitle>Image - @_image.Name</PageTitle>
-    <div class="container mt-4">
-        <h1 class="text-center">@_image.Name</h1>
-        <div class="d-flex justify-content-center my-4">
-            <img src="/api/images/@_image.Id" alt="@_image.Name" class="img-fluid rounded">
+    <div class="container-fluid p-0">
+        <div class="d-flex align-items-center justify-content-between px-3 py-2 bg-dark text-white">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link text-white" @onclick="NavigateBack">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <h5 class="m-0">@_image.Name</h5>
+            </div>
+            <div>
+                <button class="btn btn-link text-white" @onclick="OpenChooseAlbumDialog">
+                    <i class="bi bi-folder-plus"></i>
+                </button>
+                <button class="btn btn-link text-white" @onclick="DeleteImage">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <a href="/api/images/@_image.Id" class="btn btn-link text-white" download>
+                    <i class="bi bi-download"></i>
+                </a>
+            </div>
         </div>
-        <div class="d-flex justify-content-center gap-3">
-            <button class="btn btn-primary" @onclick="OpenChooseAlbumDialog">Add to Album</button>
-            <button class="btn btn-danger" @onclick="DeleteImage">Delete</button>
-            <a href="/api/images/@_image.Id" class="btn btn-success" download>Download</a>
+        <div class="d-flex justify-content-center align-items-center" style="height: 90vh;">
+            <img src="/api/images/@_image.Id" alt="@_image.Name" class="img-fluid rounded">
         </div>
     </div>
     <AlbumChooserDialog IsOpen="@_isDialogOpen" IsOpenChanged="@(open => _isDialogOpen = open)" OnAlbumSelected="HandleAlbumSelected"></AlbumChooserDialog>
@@ -41,6 +54,11 @@
         _image = image;
     }
 
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/images"); // Adjust the URL as needed
+    }
+
     private void OpenChooseAlbumDialog()
     {
         _isDialogOpen = true;
@@ -56,7 +74,7 @@
         try
         {
             await ImageService.DeleteImageAsync(ImageId);
-            NavigationManager.NavigateTo("/image");
+            NavigationManager.NavigateTo("/images"); // Adjust the URL as needed
         }
         catch (Exception ex)
         {

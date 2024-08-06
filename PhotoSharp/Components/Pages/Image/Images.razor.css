@@ -4,19 +4,48 @@
     gap: 10px;
 }
 
+.image-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.image-checkbox-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: none;
+}
+
+.image-grid.show-checkboxes .image-checkbox-container,
+.image-container:hover .image-checkbox-container {
+    display: block;
+}
+
+.image-checkbox {
+    width: 20px;
+    height: 20px;
+}
+
 .image-link {
-    display: inline-block;
+    display: block;
+    width: 100%;
+    height: 100%;
     border: 1px solid #ccc;
     border-radius: 4px;
     overflow: hidden;
-    width: 100px;
-    height: 100px;
 }
 
 .image-thumbnail {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.actions-bar {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
 }
 
 .paging-buttons {
@@ -30,15 +59,8 @@
 .paging-buttons button {
     padding: 5px 10px;
     border: none;
-    background-color: #007bff;
-    color: white;
     cursor: pointer;
     border-radius: 4px;
-}
-
-.paging-buttons button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
 }
 
 .paging-buttons span {

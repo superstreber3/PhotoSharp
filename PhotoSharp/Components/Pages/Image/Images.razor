@@ -7,27 +7,41 @@
 
 <h1>Images</h1>
 
-<div class="image-grid">
+<div class="actions-bar" style="display: @(SelectedImages.Any() ? "block" : "none")">
+    <button class="btn btn-secondary" @onclick="DeselectAll">Deselect All</button>
+    <button class="btn btn-danger" @onclick="DeleteSelectedImages">Delete Selected</button>
+</div>
+
+<div class="image-grid @(SelectedImages.Any() ? "show-checkboxes" : "")">
     @foreach (var image in _images)
     {
-        <a href="/image/@image.Id" class="image-link">
-            <img src="/api/images/@image.Id/thumbnail" alt="@image.Name" class="image-thumbnail">
-        </a>
+        <div class="image-container" @onclick="(e) => OnImageClick(image.Id, e.ShiftKey)">
+            <div class="image-checkbox-container">
+                <input type="checkbox" @bind="_isImageSelected[image.Id]" class="image-checkbox">
+            </div>
+            <a href="/image/@image.Id" class="image-link" style="opacity: @(_isImageSelected[image.Id] ? 0.5 : 1)">
+                <img src="/api/images/@image.Id/thumbnail" alt="@image.Name" class="image-thumbnail">
+            </a>
+        </div>
     }
 </div>
 
 <div class="paging-buttons">
-    <button @onclick="PreviousPage" disabled="@(_currentPage == 0)">Previous</button>
+    <button class="btn btn-primary" @onclick="PreviousPage" disabled="@(_currentPage == 0)">Previous</button>
     <span>Page @(_currentPage + 1) of @(TotalPages)</span>
-    <button @onclick="NextPage" disabled="@(_currentPage == TotalPages - 1)">Next</button>
+    <button class="btn btn-primary" @onclick="NextPage" disabled="@(_currentPage == TotalPages - 1)">Next</button>
 </div>
 
 @code {
     private List<EF.Models.Models.Image> _images = [];
+    private readonly Dictionary<Guid, bool> _isImageSelected = new();
+    private List<Guid> SelectedImages => _isImageSelected.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
     private int _imageCount;
     private int _currentPage;
-    private const int PageSize = 20;
+    private const int PageSize = 50;
     private int TotalPages => (_imageCount + PageSize - 1) / PageSize;
+
+    private Guid? _lastSelectedImageId;
 
     protected async override Task OnInitializedAsync()
     {
@@ -38,6 +52,11 @@
     {
         _images = await ImageService.GetImagesAsync(_currentPage, PageSize);
         _imageCount = await ImageService.GetImagesCountAsync();
+
+        foreach (var image in _images)
+        {
+            _isImageSelected.TryAdd(image.Id, false);
+        }
     }
 
     private async Task NextPage()
@@ -56,5 +75,53 @@
             _currentPage--;
             await LoadImages();
         }
+    }
+
+    private void OnImageClick(Guid imageId, bool shiftKeyPressed)
+    {
+        if (shiftKeyPressed && _lastSelectedImageId.HasValue)
+        {
+            SelectRange(_lastSelectedImageId.Value, imageId);
+        }
+        else
+        {
+            _isImageSelected[imageId] = !_isImageSelected[imageId];
+            _lastSelectedImageId = imageId;
+        }
+    }
+
+    private void SelectRange(Guid startId, Guid endId)
+    {
+        var startIndex = _images.FindIndex(img => img.Id == startId);
+        var endIndex = _images.FindIndex(img => img.Id == endId);
+
+        if (startIndex > endIndex)
+        {
+            (startIndex, endIndex) = (endIndex, startIndex);
+        }
+
+        for (var i = startIndex; i <= endIndex; i++)
+        {
+            _isImageSelected[_images[i].Id] = true;
+        }
+    }
+
+    private void DeselectAll()
+    {
+        foreach (var key in _isImageSelected.Keys.ToList())
+        {
+            _isImageSelected[key] = false;
+        }
+        _lastSelectedImageId = null;
+    }
+
+    private async Task DeleteSelectedImages()
+    {
+        foreach (var imageId in SelectedImages)
+        {
+            await ImageService.DeleteImageAsync(imageId);
+        }
+        DeselectAll();
+        await LoadImages();
     }
 }
